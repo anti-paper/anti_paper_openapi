@@ -321,7 +321,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ResponseSchedule"
         404:
-          description: 異常系（タスクなし）
+          description: 異常系（スケジュールなし）
           content:
             application/json:
               schema:
@@ -357,7 +357,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ResponseSchedule"
         404:
-          description: 異常系（タスクなし）
+          description: 異常系（スケジュールなし）
           content:
             application/json:
               schema:
@@ -394,7 +394,158 @@ paths:
               schema:
                 $ref: "#/components/schemas/ResponseDeletedSchedule"
         404:
-          description: 異常系（タスクなし）
+          description: 異常系（スケジュールなし）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        500:
+          description: 異常系（予期せぬエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /trash-throw-away/make:
+    post:
+      description: ゴミ捨て情報を新規に登録する
+      tags:
+        - trash-throw-away
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestTrashThrowAway"
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseTrashThrowAway"
+        422:
+          description: 異常系（バリデーションエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnprocessableEntityAboutName"
+        500:
+          description: 異常系（予期せぬエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /trash-throw-aways:
+    get:
+      description: アクティブなゴミ捨て情報を取得する
+      tags:
+        - trash-throw-away
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseTrashThrowAways"
+        500:
+          description: 異常系（予期せぬエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /trash-throw-away/{id}/detail:
+    get:
+      description: 指定したゴミ捨て情報を取得する
+      tags:
+        - trash-throw-away
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 3
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseTrashThrowAway"
+        404:
+          description: 異常系（ゴミ捨て情報なし）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        500:
+          description: 異常系（予期せぬエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /trash-throw-away/{id}/update:
+    put:
+      description: ゴミ捨て情報を更新する
+      tags:
+        - trash-throw-away
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 3
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestTrashThrowAway"
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseTrashThrowAway"
+        404:
+          description: 異常系（ゴミ捨て情報なし）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        422:
+          description: 異常系（バリデーションエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnprocessableEntityAboutName"
+        500:
+          description: 異常系（予期せぬエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /trash-throw-away/{id}/delete:
+    delete:
+      description: ゴミ捨て情報を削除する
+      tags:
+        - trash-throw-away
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 3
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseDeletedTrashThrowAway"
+        404:
+          description: 異常系（ゴミ捨て情報なし）
           content:
             application/json:
               schema:
@@ -471,6 +622,7 @@ components:
     OneTask:
       type: object
       required:
+        - id
         - name
         - content
         - tag
@@ -578,6 +730,7 @@ components:
     DeletedTask:
       type: object
       required:
+        - id
         - name
         - content
         - tag
@@ -738,6 +891,7 @@ components:
     OneSchedule:
       type: object
       required:
+        - id
         - name
         - content
         - tag
@@ -781,6 +935,7 @@ components:
     DeletedSchedule:
       type: object
       required:
+        - id
         - name
         - content
         - tag
@@ -895,6 +1050,104 @@ components:
             - 0
             - 1
           example: 1
+    NewTrashThrowAway:
+      type: object
+      required:
+        - name
+        - content
+        - tag
+        - is_done
+        - is_deleted
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 3
+        name:
+          type: string
+          example: trash-throw-away3
+        method:
+          type: string
+          example: method3
+        example:
+          type: string
+          example: example3
+        is_deleted:
+          type: integer
+          format: int32
+          description: "0:FALSE,1:TRUE"
+          enum:
+            - 0
+            - 1
+    OneTrashThrowAway:
+      type: object
+      required:
+        - id
+        - name
+        - method
+        - example
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 3
+        name:
+          type: string
+          example: trash-throw-away3
+        method:
+          type: string
+          example: method3
+        example:
+          type: string
+          example: example3
+    TrashThrowAways:
+      type: array
+      items:
+        type: object
+        $ref: "#/components/schemas/OneTrashThrowAway"
+      example:
+        - id: 1
+          name: trash-throw-away1
+          method: method1
+          example: example1
+        - id: 2
+          name: trash-throw-away2
+          method: method2
+          example: example2
+        - id: 3
+          name: trash-throw-away3
+          method: method3
+          example: example3
+    DeletedTrashThrowAway:
+      type: object
+      required:
+        - id
+        - name
+        - method
+        - example
+        - is_deleted
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 3
+        name:
+          type: string
+          example: trash-throw-away3
+        method:
+          type: string
+          example: method3
+        example:
+          type: string
+          example: example3
+        is_deleted:
+          type: integer
+          format: int32
+          description: "0:FALSE,1:TRUE"
+          enum:
+            - 0
+            - 1
+          example: 1
     RequestTask:
       type: object
       required:
@@ -959,6 +1212,22 @@ components:
         end_date:
           type: string
           example: 2026-12-31
+    RequestTrashThrowAway:
+      type: object
+      required:
+        - name
+        - method
+        - example
+      properties:
+        name:
+          type: string
+          example: tash-throw-away3
+        method:
+          type: string
+          example: method3
+        example:
+          type: string
+          example: example3
     ResponseTask:
       type: object
       properties:
@@ -967,7 +1236,6 @@ components:
           format: int32
           example: 200
         data:
-          type: object
           $ref: "#/components/schemas/NewTask"
     ResponseDoneTask:
       type: object
@@ -977,7 +1245,6 @@ components:
           format: int32
           example: 200
         data:
-          type: object
           $ref: "#/components/schemas/DoneTask"
     ResponseDeletedTask:
       type: object
@@ -987,7 +1254,6 @@ components:
           format: int32
           example: 200
         data:
-          type: object
           $ref: "#/components/schemas/DeletedTask"
     ResponseTasks:
       type: object
@@ -997,7 +1263,6 @@ components:
           format: int32
           example: 200
         data:
-          type: object
           $ref: "#/components/schemas/Tasks"
     ResponseSchedule:
       type: object
@@ -1007,18 +1272,7 @@ components:
           format: int32
           example: 200
         data:
-          type: object
           $ref: "#/components/schemas/NewSchedule"
-    ResponseSchedules:
-      type: object
-      properties:
-        code:
-          type: integer
-          format: int32
-          example: 200
-        data:
-          type: object
-          $ref: "#/components/schemas/Schedules"
     ResponseDeletedSchedule:
       type: object
       properties:
@@ -1027,8 +1281,43 @@ components:
           format: int32
           example: 200
         data:
-          type: object
           $ref: "#/components/schemas/DeletedSchedule"
+    ResponseSchedules:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 200
+        data:
+          $ref: "#/components/schemas/Schedules"
+    ResponseTrashThrowAway:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 200
+        data:
+          $ref: "#/components/schemas/NewTrashThrowAway"
+    ResponseDeletedTrashThrowAway:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 200
+        data:
+          $ref: "#/components/schemas/DeletedTrashThrowAway"
+    ResponseTrashThrowAways:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 200
+        data:
+          $ref: "#/components/schemas/TrashThrowAways"
     Other:
       type: object
       properties:
