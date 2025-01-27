@@ -1,9 +1,9 @@
-openapi: "3.1.0"
+openapi: "3.0.0"
 info:
   title: 情報管理システム
   version: 1.0.0
 servers:
-  - url: "http://localhost:8001"
+  - url: "http://localhost:8002"
 tags:
   - name: sample
     description: サンプルだにょん
@@ -41,6 +41,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int32
       responses:
         201:
           description: 正常系
@@ -114,6 +115,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int32
             example: 3
       requestBody:
         content:
@@ -150,6 +152,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int32
             example: 3
       requestBody:
         content:
@@ -192,6 +195,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int32
             example: 3
       requestBody:
         content:
@@ -234,6 +238,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int32
             example: 3
       responses:
         200:
@@ -312,6 +317,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int32
             example: 3
       responses:
         200:
@@ -343,6 +349,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int32
             example: 3
       requestBody:
         content:
@@ -385,6 +392,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int32
             example: 3
       responses:
         200:
@@ -463,6 +471,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int32
             example: 3
       responses:
         200:
@@ -494,6 +503,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int32
             example: 3
       requestBody:
         content:
@@ -536,6 +546,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int32
             example: 3
       responses:
         200:
@@ -556,6 +567,189 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/InternalServerError"
+  /trash-take-out/make:
+    post:
+      description: 1件のゴミ出し可能日を新規に登録する
+      tags:
+        - trash-take-out
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestTrashTakeOut"
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseTrashTakeOut"
+        422:
+          description: 異常系（バリデーションエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnprocessableEntityAboutTrashDay"
+        500:
+          description: 異常系（予期せぬエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /trash-take-outs/make:
+    post:
+      description: 複数件のゴミ出し可能日を新規に登録する
+      tags:
+        - trash-take-out
+      requestBody:
+        content:
+          text/csv:
+            schema:
+              $ref: "#/components/schemas/RequestTrashTakeOuts"
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseTrashTakeOuts"
+        422:
+          description: 異常系（バリデーションエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnprocessableEntityAboutTrashDay"
+        500:
+          description: 異常系（予期せぬエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /trash-take-outs:
+    get:
+      description: アクティブなゴミ出し可能日を取得する
+      tags:
+        - trash-take-out
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseTrashTakeOuts"
+        500:
+          description: 異常系（予期せぬエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /trash-take-out/{id}/detail:
+    get:
+      description: 指定したゴミ出し可能日を取得する
+      tags:
+        - trash-take-out
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 3
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseTrashTakeOut"
+        404:
+          description: 異常系（ゴミ出し可能日なし）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        500:
+          description: 異常系（予期せぬエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /trash-take-out/{id}/update:
+    put:
+      description: ゴミ出し可能日を更新する
+      tags:
+        - trash-take-out
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 3
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestTrashTakeOut"
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseTrashTakeOut"
+        404:
+          description: 異常系（ゴミ出し可能日なし）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        422:
+          description: 異常系（バリデーションエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnprocessableEntityAboutTrashDay"
+        500:
+          description: 異常系（予期せぬエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /trash-take-out/{id}/delete:
+    delete:
+      description: ゴミ出し可能日を削除する
+      tags:
+        - trash-take-out
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 3
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseDeletedTrashTakeOut"
+        404:
+          description: 異常系（ゴミ出し可能日なし）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        500:
+          description: 異常系（予期せぬエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 components:
   schemas:
     Sample:
@@ -565,7 +759,7 @@ components:
       properties:
         id:
           type: integer
-          format: int64
+          format: int32
           example: 100
         name:
           type: string
@@ -1053,10 +1247,10 @@ components:
     NewTrashThrowAway:
       type: object
       required:
+        - id
         - name
-        - content
-        - tag
-        - is_done
+        - method
+        - example
         - is_deleted
       properties:
         id:
@@ -1148,6 +1342,101 @@ components:
             - 0
             - 1
           example: 1
+    NewTrashTakeOut:
+      type: object
+      required:
+        - id
+        - trash_day
+        - trashes
+        - is_deleted
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 3
+        trash_day:
+          type: string
+          example: "2025-01-31 00:00:00"
+        trashes:
+          type: array
+          items:
+            $ref: "#/components/schemas/OneTrashThrowAway"
+        is_deleted:
+          type: integer
+          format: int32
+          description: "0:FALSE,1:TRUE"
+          enum:
+            - 0
+            - 1
+    OneTrashTakeOut:
+      type: object
+      required:
+        - id
+        - trash_day
+        - trashes
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 3
+        trash_day:
+          type: string
+          example: "2025-01-31 00:00:00"
+        trashes:
+          type: array
+          items:
+            $ref: "#/components/schemas/OneTrashThrowAway"
+    TrashTakeOuts:
+      type: array
+      items:
+        type: object
+        $ref: "#/components/schemas/OneTrashTakeOut"
+      example:
+        - id: 1
+          trash_day: "2024-12-31 00:00:00"
+          trashes:
+            - id: 1
+              name: trash-throw-away1
+              method: method1
+              example: example1
+        - id: 2
+          trash_day: "2025-01-01 00:00:00"
+          trashes:
+            - id: 1
+              name: trash-throw-away1
+              method: method1
+              example: example1
+            - id: 2
+              name: trash-throw-away2
+              method: method2
+              example: example2
+    DeletedTrashTakeOut:
+      type: object
+      required:
+        - id
+        - trash_day
+        - trashes
+        - is_deleted
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 3
+        trash_day:
+          type: string
+          example: "2025-01-31 00:00:00"
+        trashes:
+          type: array
+          items:
+            $ref: "#/components/schemas/OneTrashThrowAway"
+        is_deleted:
+          type: integer
+          format: int32
+          description: "0:FALSE,1:TRUE"
+          enum:
+            - 0
+            - 1
+          example: 1
     RequestTask:
       type: object
       required:
@@ -1228,6 +1517,25 @@ components:
         example:
           type: string
           example: example3
+    RequestTrashTakeOut:
+      type: object
+      required:
+        - trash_day
+        - trash_ids
+      properties:
+        trash_day:
+          type: string
+          description: ゴミ出し可能日
+          example: "2025-01-31 00:00:00"
+        trash_ids:
+          type: array
+          items:
+            type: integer
+            format: int32
+            example: 3
+    RequestTrashTakeOuts:
+      type: string
+      example: "trash_day,trash_id,trash_day_id\n2024-12-31 00:00:00,1,1\n2025-01-31 00:00:00,1,2\n2025-01-31 00:00:00,2,2"
     ResponseTask:
       type: object
       properties:
@@ -1318,6 +1626,33 @@ components:
           example: 200
         data:
           $ref: "#/components/schemas/TrashThrowAways"
+    ResponseTrashTakeOut:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 200
+        data:
+          $ref: "#/components/schemas/NewTrashTakeOut"
+    ResponseDeletedTrashTakeOut:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 200
+        data:
+          $ref: "#/components/schemas/DeletedTrashTakeOut"
+    ResponseTrashTakeOuts:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 200
+        data:
+          $ref: "#/components/schemas/TrashTakeOuts"
     Other:
       type: object
       properties:
@@ -1358,6 +1693,16 @@ components:
         message:
           type: string
           example: "'is_done'は必須項目です。"
+    UnprocessableEntityAboutTrashDay:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 422
+        message:
+          type: string
+          example: "'trash_day'は必須項目です。"
     InternalServerError:
       type: object
       properties:
