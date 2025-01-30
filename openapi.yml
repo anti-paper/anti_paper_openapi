@@ -7,6 +7,8 @@ servers:
 tags:
   - name: sample
     description: サンプルだにょん
+  - name: task
+    description: タスク管理
 paths:
   /sample/{id}:
     get:
@@ -35,6 +37,203 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Other"
+  /task/create:
+    post:
+      description: タスクを新規に登録する
+      tags:
+        - task
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestTask"
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseCreatedTask"
+        422:
+          description: 異常系（バリデーションエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnprocessableEntityAboutName"
+        500:
+          description: 異常系（予期せぬエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /tasks:
+    get:
+      description: 未削除のタスクを一括で取得する
+      tags:
+        - task
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseTasks"
+        500:
+          description: 異常系（予期せぬエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /task/{id}:
+    get:
+      description: 指定したタスクを取得する
+      tags:
+        - task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 3
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseTask"
+        404:
+          description: 異常系（タスクなし）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        500:
+          description: 異常系（予期せぬエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /task/{id}/update-status:
+    patch:
+      description: タスクのステータスを更新する
+      tags:
+        - task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 3
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestUpdatingTaskStatus"
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseUpdatedTaskStatus"
+        404:
+          description: 異常系（タスクなし）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        422:
+          description: 異常系（バリデーションエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnprocessableEntityAboutIsDone"
+        500:
+          description: 異常系（予期せぬエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /task/{id}/update:
+    put:
+      description: タスクを更新する
+      tags:
+        - task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 3
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestTask"
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseUpdatedTask"
+        404:
+          description: 異常系（タスクなし）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        422:
+          description: 異常系（バリデーションエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnprocessableEntityAboutName"
+        500:
+          description: 異常系（予期せぬエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /task/{id}/delete:
+    delete:
+      description: タスクを削除する
+      tags:
+        - task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 3
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseDeletedTask"
+        404:
+          description: 異常系（タスクなし）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        500:
+          description: 異常系（予期せぬエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 components:
   schemas:
     Sample:
@@ -55,6 +254,137 @@ components:
           enum:
             - 有効
             - 非有効
+    RequestTask:
+      type: object
+      required:
+        - name
+        - content
+      properties:
+        name:
+          type: string
+          example: task3
+        content:
+          type: string
+          example: description3
+    RequestUpdatingTaskStatus:
+      type: object
+      required:
+        - is_done
+      properties:
+        is_done:
+          type: boolean
+          enum:
+            - false
+            - true
+          example: true
+    ResponseCreatedTask:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "タスクの作成に成功しました。"
+    ResponseTasks:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/Tasks"
+    ResponseTask:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        data:
+          type: object
+          $ref: "#/components/schemas/Task"
+    ResponseUpdatedTaskStatus:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "タスクステータスの更新に成功しました。"
+    ResponseUpdatedTask:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "タスクの更新に成功しました。"
+    ResponseDeletedTask:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "タスクの削除に成功しました。"
+    Tasks:
+      type: array
+      items:
+        type: object
+        $ref: "#/components/schemas/Task"
+      example:
+        - id: 1
+          name: task1
+          content: description1
+          tag: 0
+          is_done: 0
+          updated_at: 2024-01-01
+        - id: 2
+          name: task2
+          content: description2
+          tag: 1
+          is_done: 1
+          updated_at: 2025-06-15
+        - id: 3
+          name: task3
+          content: description3
+          tag: 2
+          is_done: 0
+          updated_at: 2026-12-31
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 3
+        name:
+          type: string
+          example: task3
+        content:
+          type: string
+          example: description3
+        tag:
+          type: integer
+          format: int32
+          description: "0:通常,1:買い物,2:スケジュール,3:ゴミ出し,4:筋トレ"
+          enum:
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+        is_done:
+          type: boolean
+          enum:
+            - false
+            - true
+        updated_at:
+          type: string
+          example: 2024-01-01
     Other:
       type: object
       properties:
