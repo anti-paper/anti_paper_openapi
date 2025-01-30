@@ -58,60 +58,54 @@ components:
     Other:
       type: object
       properties:
-        code:
-          type: integer
-          format: int32
-          example: 404
+        status:
+          type: boolean
+          example: false
         message:
           type: string
           example: "Not found."
     NotFound:
       type: object
       properties:
-        code:
-          type: integer
-          format: int32
-          example: 404
+        status:
+          type: boolean
+          example: false
         message:
           type: string
           example: コンテンツがありません。
     UnprocessableEntityAboutName:
       type: object
       properties:
-        code:
-          type: integer
-          format: int32
-          example: 422
+        status:
+          type: boolean
+          example: false
         message:
           type: string
           example: "'name'は必須項目です。"
     UnprocessableEntityAboutIsDone:
       type: object
       properties:
-        code:
-          type: integer
-          format: int32
-          example: 422
+        status:
+          type: boolean
+          example: false
         message:
           type: string
           example: "'is_done'は必須項目です。"
     UnprocessableEntityAboutTrashDay:
       type: object
       properties:
-        code:
-          type: integer
-          format: int32
-          example: 422
+        status:
+          type: boolean
+          example: false
         message:
           type: string
           example: "'trash_day'は必須項目です。"
     InternalServerError:
       type: object
       properties:
-        code:
-          type: integer
-          format: int32
-          example: 500
+        status:
+          type: boolean
+          example: false
         message:
           type: string
           example: 予期せぬエラーが発生しました。
