@@ -118,7 +118,7 @@ paths:
                 $ref: "#/components/schemas/InternalServerError"
   /task/{id}/update-status:
     patch:
-      description: タスクのステータスを更新する
+      description: 指定したタスクのステータスを更新する
       tags:
         - task
       parameters:
@@ -161,7 +161,7 @@ paths:
                 $ref: "#/components/schemas/InternalServerError"
   /task/{id}/update:
     put:
-      description: タスクを更新する
+      description: 指定したタスクを更新する
       tags:
         - task
       parameters:
@@ -204,7 +204,7 @@ paths:
                 $ref: "#/components/schemas/InternalServerError"
   /task/{id}/delete:
     delete:
-      description: タスクを削除する
+      description: 指定したタスクを削除する
       tags:
         - task
       parameters:
