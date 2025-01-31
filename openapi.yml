@@ -7,6 +7,8 @@ servers:
 tags:
   - name: sample
     description: サンプルだにょん
+  - name: schedule
+    description: スケジュール管理
 paths:
   /sample/{id}:
     get:
@@ -35,6 +37,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Other"
+  /schedule/create:
+    post:
+      description: スケジュールを新規に登録する
+      tags:
+        - schedule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestSchedule"
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseCreatedSchedule"
+        422:
+          description: 異常系（バリデーションエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnprocessableEntityAboutName"
+        500:
+          description: 異常系（予期せぬエラー）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 components:
   schemas:
     Sample:
@@ -55,6 +86,44 @@ components:
           enum:
             - 有効
             - 非有効
+    RequestSchedule:
+      type: object
+      required:
+        - name
+        - content
+        - frequency
+        - start_date
+      properties:
+        name:
+          type: string
+          example: schedule3
+        content:
+          type: string
+          example: description3
+        frequency:
+          type: integer
+          format: int32
+          description: "0:日次 1:週次 2:月次 3:年次"
+          enum:
+            - 0
+            - 1
+            - 2
+            - 3
+        start_date:
+          type: string
+          example: 2024-01-01
+        end_date:
+          type: string
+          example: 2026-12-31
+    ResponseCreatedSchedule:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "スケジュールの作成に成功しました。"
     Other:
       type: object
       properties:
