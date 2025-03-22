@@ -5,65 +5,93 @@ info:
 servers:
   - url: "http://localhost:8002"
 tags:
-  - name: sample
-    description: サンプルだにょん
+  - name: top
+    description: トップページで必要になる情報をまとめて管理
+  - name: task
+    description: タスク管理
 paths:
-  /sample/{id}:
+  /top:
     get:
-      description: サンプル説明
+      description: 本日以前が対象となる情報の概要を取得する
       tags:
-        - sample
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
+        - top
       responses:
-        201:
+        200:
           description: 正常系
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Sample"
-        default:
-          description: 異常系
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Other"
+                $ref: "#/components/schemas/Top"
 components:
   schemas:
-    Sample:
+    ShortTask:
       type: object
-      required:
-        - name
       properties:
         id:
           type: integer
           format: int32
-          example: 100
         name:
           type: string
-          example: anti-paper
-        status:
+        target_date:
           type: string
-          description: 状態
-          enum:
-            - 有効
-            - 非有効
-    Other:
+    ShortSchedule:
       type: object
       properties:
-        status:
-          type: boolean
-          example: false
-        message:
+        id:
+          type: integer
+          format: int32
+        name:
           type: string
-          example: "Not found."
+        start_datetime:
+          type: string
+        end_datetime:
+          type: string
+    ShortMuscleTrainingHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        count:
+          type: integer
+          format: int32
+        created_at:
+          type: string
+    Top:
+      type: object
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/ShortTask"
+          example:
+            - id: 1
+              name: 読書
+              target_date: '2025-03-21'
+        schedules:
+          type: array
+          items:
+            $ref: "#/components/schemas/ShortSchedule"
+          example:
+            - id: 1
+              name: ゴミ捨て
+              start_datetime: '2025-03-21 09:00:00'
+              end_datetime: '2025-03-21 09:00:00'
+            - id: 2
+              name: バイオリンレッスン
+              start_datetime: '2021-03-16 15:00:00'
+              end_datetime: '2025-07-23 16:00:00'
+        muscle_training_histories:
+          type: array
+          items:
+            $ref: "#/components/schemas/ShortMuscleTrainingHistory"
+          example:
+            - id: 1
+              name: ゴミ捨て
+              count: 15
+              created_at: '2025-03-21 03:44:25'
     NotFound:
       type: object
       properties:
@@ -91,15 +119,6 @@ components:
         message:
           type: string
           example: "'is_done'は必須項目です。"
-    UnprocessableEntityAboutTrashDay:
-      type: object
-      properties:
-        status:
-          type: boolean
-          example: false
-        message:
-          type: string
-          example: "'trash_day'は必須項目です。"
     InternalServerError:
       type: object
       properties:
