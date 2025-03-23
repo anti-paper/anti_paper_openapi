@@ -22,6 +22,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Top"
+  /task/register:
+    post:
+      description: タスクを新規に登録する
+      tags:
+        - task
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LongTask"
+      responses:
+        201:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskCreated"
+        422:
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskUnprocessable"
+        500:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 components:
   schemas:
     ShortTask:
@@ -34,6 +63,24 @@ components:
           type: string
         target_date:
           type: string
+    LongTask:
+      type: object
+      required:
+        - name
+        - target_date
+      properties:
+        name:
+          type: string
+          example: 読書
+        content:
+          type: string
+          example: |-
+            以下読む
+            ・サルでもわかるAWS
+            ・サルでもわかる要件定義
+        target_date:
+          type: string
+          example: "2024/7/23"
     ShortSchedule:
       type: object
       properties:
@@ -92,6 +139,15 @@ components:
               name: ゴミ捨て
               count: 15
               created_at: '2025-03-21 03:44:25'
+    TaskCreated:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: タスクの登録が完了しました。
     NotFound:
       type: object
       properties:
@@ -101,15 +157,19 @@ components:
         message:
           type: string
           example: コンテンツがありません。
-    UnprocessableEntityAboutName:
+    TaskUnprocessable:
       type: object
       properties:
         status:
           type: boolean
           example: false
-        message:
-          type: string
-          example: "'name'は必須項目です。"
+        messages:
+          type: array
+          items:
+            type: string
+          example:
+            - "'name'は必須項目です。"
+            - "'target_date'は必須項目です。"
     UnprocessableEntityAboutIsDone:
       type: object
       properties:
