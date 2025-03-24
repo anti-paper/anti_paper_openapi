@@ -33,12 +33,87 @@ paths:
             schema:
               $ref: "#/components/schemas/LongTask"
       responses:
-        201:
+        200:
           description: 正常系
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/TaskRegistered"
+        422:
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskUnprocessable"
+        500:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /task/{id}/info:
+    get:
+      description: タスクを取得する
+      tags:
+        - task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 3
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskInfo"
+        404:
+          description: タスクなし
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        500:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /task/{id}/update:
+    put:
+      description: タスクを更新する
+      tags:
+        - task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 3
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LongTask"
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskUpdated"
+        404:
+          description: タスクなし
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
         422:
           description: バリデーションエラー
           content:
@@ -148,6 +223,23 @@ components:
         message:
           type: string
           example: タスクの登録が完了しました。
+    TaskInfo:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/LongTask"
+    TaskUpdated:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: タスクの更新が完了しました。
     NotFound:
       type: object
       properties:
