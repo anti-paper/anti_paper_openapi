@@ -21,7 +21,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Top"
+                $ref: "#/components/schemas/TopInfo"
+        500:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
   /task/register:
     post:
       description: タスクを新規に登録する
@@ -214,6 +220,14 @@ components:
               name: ゴミ捨て
               count: 15
               created_at: '2025-03-21 03:44:25'
+    TopInfo:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/Top"
     TaskRegistered:
       type: object
       properties:
