@@ -1,7 +1,7 @@
 openapi: "3.0.0"
 info:
   title: 情報管理システム
-  version: 1.0.0
+  version: "1.0"
 servers:
   - url: "http://localhost:8002"
 tags:
@@ -9,8 +9,10 @@ tags:
     description: トップページで必要になる情報をまとめて管理
   - name: task
     description: タスク管理
+  - name: schedule
+    description: スケジュール管理
 paths:
-  /top:
+  /all:
     get:
       description: 本日以前が対象となる情報の概要を取得する
       tags:
@@ -132,6 +134,206 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/InternalServerError"
+  /task/{id}/done:
+    put:
+      description: タスクを完了する
+      tags:
+        - task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 3
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskDone"
+        404:
+          description: タスクなし
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        500:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /task/{id}/delete:
+    delete:
+      description: タスクを削除する
+      tags:
+        - task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 3
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskDeleted"
+        404:
+          description: タスクなし
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        500:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /schedule/register:
+    post:
+      description: スケジュールを新規に登録する
+      tags:
+        - schedule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LongSchedule"
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduleRegistered"
+        422:
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduleUnprocessable"
+        500:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /schedule/{id}/info:
+    get:
+      description: スケジュールを取得する
+      tags:
+        - schedule
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 3
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduleInfo"
+        404:
+          description: スケジュールなし
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        500:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /schedule/{id}/update:
+    put:
+      description: スケジュールを更新する
+      tags:
+        - schedule
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 3
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LongSchedule"
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduleUpdated"
+        404:
+          description: スケジュールなし
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        422:
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduleUnprocessable"
+        500:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /schedule/{id}/delete:
+    delete:
+      description: スケジュールを削除する
+      tags:
+        - schedule
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 3
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduleDeleted"
+        404:
+          description: スケジュールなし
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        500:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 components:
   schemas:
     ShortTask:
@@ -174,6 +376,44 @@ components:
           type: string
         end_datetime:
           type: string
+    LongSchedule:
+      type: object
+      required:
+        - name
+        - frequency
+        - month
+        - day
+        - week_day
+        - start_datetime
+      properties:
+        name:
+          type: string
+          example: バイオリンレッスン
+        content:
+          type: string
+          example: "-"
+        frequency:
+          type: integer
+          format: int32
+          example: 0
+        month:
+          type: integer
+          format: int32
+          example: 1
+        day:
+          type: integer
+          format: int32
+          example: 1
+        week_day:
+          type: integer
+          format: int32
+          example: 0
+        start_datetime:
+          type: string
+          example: "2021/3/16 15:00:00"
+        end_datetime:
+          type: string
+          example: "2025/7/23 16:00:00"
     ShortMuscleTrainingHistory:
       type: object
       properties:
@@ -254,6 +494,59 @@ components:
         message:
           type: string
           example: タスクの更新が完了しました。
+    TaskDone:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: タスクの完了処理が完了しました。
+    TaskDeleted:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: タスクの削除が完了しました。
+    ScheduleRegistered:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: スケジュールの登録が完了しました。
+    ScheduleInfo:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        data:
+          $ref: "#/components/schemas/LongSchedule"
+    ScheduleUpdated:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: スケジュールの更新が完了しました。
+    ScheduleDeleted:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: スケジュールの削除が完了しました。
     NotFound:
       type: object
       properties:
@@ -276,15 +569,19 @@ components:
           example:
             - "'name'は必須項目です。"
             - "'target_date'は必須項目です。"
-    UnprocessableEntityAboutIsDone:
+    ScheduleUnprocessable:
       type: object
       properties:
         status:
           type: boolean
           example: false
-        message:
-          type: string
-          example: "'is_done'は必須項目です。"
+        messages:
+          type: array
+          items:
+            type: string
+          example:
+            - "'name'は必須項目です。"
+            - "'start_datetime'は必須項目です。"
     InternalServerError:
       type: object
       properties:
