@@ -198,6 +198,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/InternalServerError"
+  /schedule/list:
+    get:
+      description: スケジュール一覧を取得する
+      tags:
+        - schedule
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduleList"
+        500:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
   /schedule/register:
     post:
       description: スケジュールを新規に登録する
@@ -414,6 +432,19 @@ components:
         end_datetime:
           type: string
           example: "2025/7/23 16:00:00"
+    Shcedules:
+      type: array
+      items:
+        $ref: "#/components/schemas/ShortSchedule"
+      example:
+        - id: 1
+          name: バイオリンレッスン
+          start_datetime: '2021-03-16 15:00:00'
+          end_datetime: '2025-07-23 16:00:00'
+        - id: 2
+          name: 脱毛
+          start_datetime: '2022-02-22 13:00:00'
+          end_datetime: null
     ShortMuscleTrainingHistory:
       type: object
       properties:
@@ -512,6 +543,15 @@ components:
         message:
           type: string
           example: タスクの削除が完了しました。
+    ScheduleList:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        data:
+          type: array
+          $ref: "#/components/schemas/Shcedules"
     ScheduleRegistered:
       type: object
       properties:
