@@ -11,6 +11,8 @@ tags:
     description: タスク管理
   - name: schedule
     description: スケジュール管理
+  - name: muscle
+    description: 筋トレ管理
 paths:
   /all:
     get:
@@ -352,6 +354,85 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/InternalServerError"
+  /muscle/{id}/done:
+    put:
+      description: 筋トレを完了する
+      tags:
+        - muscle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 3
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MuscleDone"
+        404:
+          description: 筋トレなし
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        500:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /muscle/config/info:
+    get:
+      description: 筋トレ設定を取得する
+      tags:
+        - muscle
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MuscleConfigInfo"
+        500:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /muscle/config/update:
+    put:
+      description: 筋トレ設定を更新する
+      tags:
+        - muscle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MuscleConfig"
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MuscleConfigUpdated"
+        404:
+          description: 筋トレメニューなし
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        500:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 components:
   schemas:
     ShortTask:
@@ -458,6 +539,59 @@ components:
           format: int32
         created_at:
           type: string
+    MuscleMenu:
+      type: object
+      required:
+        - id
+        - name
+        - priority
+        - is_deleted
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        priority:
+          type: integer
+          format: int32
+        is_deleted:
+          type: integer
+          format: int32
+    MuscleConfig:
+      type: object
+      required:
+        - count
+        - rotation_start_date
+      properties:
+        count:
+          type: integer
+          format: int32
+          example: 10
+        rotation_start_date:
+          type: string
+          example: '2025-03-21'
+        menus:
+          type: array
+          items:
+            $ref: "#/components/schemas/MuscleMenu"
+          example:
+            - id: 1
+              name: 腕立て伏せ
+              priority: 1
+              is_deleted: 0
+            - id: 2
+              name: 腹筋
+              priority: 2
+              is_deleted: 0
+            - id: 3
+              name: 縄跳び
+              priority: 3
+              is_deleted: 1
+            - id: 4
+              name: スクワット
+              priority: 3
+              is_deleted: 0
     Top:
       type: object
       properties:
@@ -587,6 +721,33 @@ components:
         message:
           type: string
           example: スケジュールの削除が完了しました。
+    MuscleDone:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: 筋トレの完了処理が完了しました。
+    MuscleConfigInfo:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        data:
+          type: object
+          $ref: "#/components/schemas/MuscleConfig"
+    MuscleConfigUpdated:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: 筋トレ設定の更新が完了しました。
     NotFound:
       type: object
       properties:
