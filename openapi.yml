@@ -13,6 +13,8 @@ tags:
     description: スケジュール管理
   - name: muscle
     description: 筋トレ管理
+  - name: handover
+    description: 引き継ぎ管理
 paths:
   /all:
     get:
@@ -397,7 +399,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MuscleConfigInfo"
+                $ref: "#/components/schemas/MuscleTrainingConfigInfo"
         500:
           description: 予期せぬエラー
           content:
@@ -413,20 +415,72 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MuscleConfig"
+              $ref: "#/components/schemas/MuscleTrainingConfig"
       responses:
         200:
           description: 正常系
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MuscleConfigUpdated"
+                $ref: "#/components/schemas/MuscleTrainingConfigUpdated"
         404:
           description: 筋トレメニューなし
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/NotFound"
+        500:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /handover/do:
+    put:
+      description: データを引き継ぎする
+      tags:
+        - handover
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HandOverCode"
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HandOverDone"
+        404:
+          description: 引き継ぎコードなし
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        500:
+          description: 予期せぬエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /handover/code/issue:
+    put:
+      description: 引き継ぎコードを発行する
+      tags:
+        - handover
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HandOverData"
+      responses:
+        200:
+          description: 正常系
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HandOverIssued"
         500:
           description: 予期せぬエラー
           content:
@@ -463,6 +517,37 @@ components:
         target_date:
           type: string
           example: "2024/7/23"
+    FullTask:
+      type: object
+      required:
+        - id
+        - name
+        - content
+        - target_date
+        - is_done
+        - is_deleted
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        content:
+          type: string
+        target_date:
+          type: string
+        is_done:
+          type: integer
+          format: int32
+        is_deleted:
+          type: integer
+          format: int32
+        created_at:
+          type: string
+        updated_at:
+          type: string
     ShortSchedule:
       type: object
       properties:
@@ -513,6 +598,52 @@ components:
         end_datetime:
           type: string
           example: "2025/7/23 16:00:00"
+    FullSchedule:
+      type: object
+      required:
+        - id
+        - name
+        - content
+        - frequency
+        - month
+        - day
+        - week_day
+        - start_datetime
+        - end_datetime
+        - is_deleted
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        content:
+          type: string
+        frequency:
+          type: integer
+          format: int32
+        month:
+          type: integer
+          format: int32
+        day:
+          type: integer
+          format: int32
+        week_day:
+          type: integer
+          format: int32
+        start_datetime:
+          type: string
+        end_datetime:
+          type: string
+        is_deleted:
+          type: integer
+          format: int32
+        created_at:
+          type: string
+        updated_at:
+          type: string
     Shcedules:
       type: array
       items:
@@ -539,7 +670,43 @@ components:
           format: int32
         created_at:
           type: string
-    MuscleMenu:
+    FullMuscleTrainingHistory:
+      type: object
+      required:
+        - id
+        - name
+        - count
+        - is_done
+        - is_deleted
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+        name:
+          type: string
+          example: "腕立て伏せ"
+        count:
+          type: integer
+          format: int32
+          example: 10
+        is_done:
+          type: integer
+          format: int32
+          example: 1
+        is_deleted:
+          type: integer
+          format: int32
+          example: 0
+        created_at:
+          type: string
+          example: "2025-03-24 01:26:38"
+        updated_at:
+          type: string
+          example: "2025-03-24 01:26:38"
+    ShortMuscleTrainingMenu:
       type: object
       required:
         - id
@@ -558,7 +725,32 @@ components:
         is_deleted:
           type: integer
           format: int32
-    MuscleConfig:
+    FullMuscleTrainingMenu:
+      type: object
+      required:
+        - id
+        - name
+        - priority
+        - is_deleted
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        priority:
+          type: integer
+          format: int32
+        is_deleted:
+          type: integer
+          format: int32
+        created_at:
+          type: string
+        updated_at:
+          type: string
+    MuscleTrainingConfig:
       type: object
       required:
         - count
@@ -574,7 +766,7 @@ components:
         menus:
           type: array
           items:
-            $ref: "#/components/schemas/MuscleMenu"
+            $ref: "#/components/schemas/ShortMuscleTrainingMenu"
           example:
             - id: 1
               name: 腕立て伏せ
@@ -592,6 +784,135 @@ components:
               name: スクワット
               priority: 3
               is_deleted: 0
+    FullMuscleTrainingConfig:
+      type: object
+      required:
+        - id
+        - count
+        - rotation_start_date
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+        count:
+          type: integer
+          format: int32
+          example: 10
+        rotation_start_date:
+          type: string
+          example: '2025-03-21'
+        created_at:
+          type: string
+          example: '2025-03-21 00:45:37'
+        updated_at:
+          type: string
+          example: '2025-03-21 00:45:37'
+    HandOverCode:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          example: ANT294876t7FUhewOiur287
+    HandOverData:
+      type: object
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/FullTask"
+          example:
+            - id: 1
+              name: 読書
+              content: |-
+                以下読む
+                ・サルでもわかるAWS
+                ・サルでもわかる要件定義
+              target_date: '2025-03-21'
+              is_done: 0
+              is_deleted: 0
+              created_at: "2025-03-03 03:34:21"
+              updated_at: "2025-03-03 03:34:21"
+        schedules:
+          type: array
+          items:
+            $ref: "#/components/schemas/FullSchedule"
+          example:
+            - id: 1
+              name: ゴミ捨て
+              content: |-
+                可燃ごみ
+                ・ゴム
+                ・パンの耳
+              frequency: 0
+              month: 1
+              day: 1
+              week_day: 0
+              start_datetime: '2025-03-21 09:00:00'
+              end_datetime: '2025-03-21 09:00:00'
+              is_deleted: 0
+              created_at: '2025-03-20 03:45:23'
+              updated_at: '2025-03-20 03:46:01'
+            - id: 2
+              name: バイオリンレッスン
+              content: |-
+                月謝支払いあり
+              frequency: 1
+              month: 1
+              day: 1
+              week_day: 6
+              start_datetime: '2021-03-16 15:00:00'
+              end_datetime: '2025-07-23 16:00:00'
+              is_deleted: 0
+              created_at: '2027-02-20 03:45:23'
+              updated_at: '2027-02-22 04:46:01'
+        muscle_training_menus:
+          type: array
+          items:
+            $ref: "#/components/schemas/FullMuscleTrainingMenu"
+          example:
+            - id: 1
+              name: 腕立て伏せ
+              priority: 1
+              is_deleted: 0
+              created_at: "2020-03-21 13:31:22"
+              updated_at: "2020-03-21 13:31:22"
+            - id: 2
+              name: 腹筋
+              priority: 2
+              is_deleted: 0
+              created_at: "2020-03-21 13:31:22"
+              updated_at: "2020-03-21 13:31:22"
+            - id: 3
+              name: 縄跳び
+              priority: 3
+              is_deleted: 1
+              created_at: "2020-03-21 13:31:22"
+              updated_at: "2025-03-21 03:02:58"
+            - id: 4
+              name: スクワット
+              priority: 3
+              is_deleted: 0
+              created_at: "2020-03-21 13:31:22"
+              updated_at: "2020-03-21 13:31:22"
+        muscle_training_config:
+          $ref: "#/components/schemas/FullMuscleTrainingConfig"
+        muscle_training_histories:
+          type: array
+          items:
+            $ref: "#/components/schemas/FullMuscleTrainingHistory"
+          example:
+            - id: 1
+              name: 腕立て伏せ
+              count: 10
+              is_done: 1
+              is_deleted: 0
+              created_at: "2025-03-24 01:26:38"
+              updated_at: "2025-03-24 01:26:38"
     Top:
       type: object
       properties:
@@ -730,7 +1051,7 @@ components:
         message:
           type: string
           example: 筋トレの完了処理が完了しました。
-    MuscleConfigInfo:
+    MuscleTrainingConfigInfo:
       type: object
       properties:
         status:
@@ -738,8 +1059,8 @@ components:
           example: true
         data:
           type: object
-          $ref: "#/components/schemas/MuscleConfig"
-    MuscleConfigUpdated:
+          $ref: "#/components/schemas/MuscleTrainingConfig"
+    MuscleTrainingConfigUpdated:
       type: object
       properties:
         status:
@@ -748,6 +1069,24 @@ components:
         message:
           type: string
           example: 筋トレ設定の更新が完了しました。
+    HandOverIssued:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        data:
+          type: array
+          $ref: "#/components/schemas/HandOverCode"
+    HandOverDone:
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        data:
+          type: object
+          $ref: "#/components/schemas/HandOverData"
     NotFound:
       type: object
       properties:
